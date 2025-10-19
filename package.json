@@ -1,0 +1,25 @@
+{
+    "name": "retropricebr",
+    "private": true,
+    "version": "0.1.0",
+    "workspaces": [
+        "apps/*",
+        "packages/*"
+    ],
+    "scripts": {
+        "build": "npm run build --workspace @retroprice/shared && npm run build --workspace @retroprice/core && npm run build --workspace @retroprice/db && npm run build:web && npm run build:worker",
+        "dev:web": "npm run dev --workspace web",
+        "build:web": "npm run build --workspace web",
+        "start:web": "npm run start --workspace web",
+        "lint:web": "npm run lint --workspace web",
+        "dev:worker": "npm run dev --workspace worker",
+        "build:worker": "npm run build --workspace worker",
+        "start:worker": "npm run start --workspace worker",
+        "db:migrate": "npm run migrate --workspace @retroprice/db",
+        "db:seed": "npm run seed --workspace @retroprice/db",
+        "db:setup": "npm run setup --workspace @retroprice/db"
+    },
+    "engines": {
+        "node": ">=20.0.0"
+    }
+}

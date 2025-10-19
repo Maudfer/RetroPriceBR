@@ -1,0 +1,24 @@
+# syntax=docker/dockerfile:1.7-labs
+FROM node:20-bookworm-slim AS base
+WORKDIR /app
+ENV NODE_ENV=production
+
+FROM base AS deps
+COPY package.json package-lock.json tsconfig.base.json ./
+COPY apps/web/package.json apps/web/package.json
+COPY apps/worker/package.json apps/worker/package.json
+COPY packages/shared/package.json packages/shared/package.json
+COPY packages/core/package.json packages/core/package.json
+COPY packages/db/package.json packages/db/package.json
+RUN npm install
+
+FROM deps AS builder
+COPY . .
+RUN npm run build:worker
+
+FROM base AS runner
+WORKDIR /app
+COPY --from=builder /app/apps/worker/dist /app/apps/worker/dist
+COPY --from=builder /app/apps/worker/package.json /app/apps/worker/package.json
+COPY --from=builder /app/node_modules /app/node_modules
+CMD ["npm", "run", "start:worker"]

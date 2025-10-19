@@ -1,0 +1,23 @@
+{
+    "name": "@retroprice/core",
+    "version": "0.1.0",
+    "private": false,
+    "type": "module",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "build": "tsc --build tsconfig.json"
+    },
+    "dependencies": {
+        "@retroprice/shared": "0.1.0"
+    },
+    "exports": {
+        ".": {
+            "import": "./dist/index.js",
+            "types": "./dist/index.d.ts"
+        }
+    }
+}

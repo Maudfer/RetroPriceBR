@@ -1,0 +1,17 @@
+node_modules/
+.env*
+!.env.example
+.npmrc
+*.log
+/.next/
+**/.next/
+dist/
+.tmp/
+.cache/
+.DS_Store
+coverage/
+**/dist/
+**/.turbo/
+**/tsconfig.tsbuildinfo
+pnpm-lock.yaml
+yarn.lock

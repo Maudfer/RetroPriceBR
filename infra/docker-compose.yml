@@ -1,0 +1,90 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+      POSTGRES_DB: app
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  cache:
+    image: valkey/valkey:7
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
+  objectstore:
+    image: localstack/localstack:latest
+    restart: unless-stopped
+    environment:
+      - SERVICES=s3
+      - DEBUG=0
+    ports:
+      - "4566:4566"
+    volumes:
+      - localstack:/var/lib/localstack
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  db_setup:
+    build:
+      context: ..
+      dockerfile: packages/db/Dockerfile
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql://app:app@db:5432/app
+    restart: "no"
+
+  web:
+    build:
+      context: ..
+      dockerfile: apps/web/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - db
+      - cache
+      - objectstore
+      - db_setup
+    environment:
+      DATABASE_URL: postgresql://app:app@db:5432/app
+      REDIS_URL: redis://cache:6379
+      S3_ENDPOINT: http://objectstore:4566
+      S3_REGION: us-east-1
+      S3_ACCESS_KEY_ID: test
+      S3_SECRET_ACCESS_KEY: test
+      EVIDENCE_BUCKET: evidence-sanitized
+      THUMBS_BUCKET: evidence-thumbs
+      JWT_JWKS_URI: http://web:3000/.well-known/jwks.json
+      NEXT_PUBLIC_API_URL: http://localhost:3000
+    ports:
+      - "3000:3000"
+
+  worker:
+    build:
+      context: ..
+      dockerfile: apps/worker/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - db
+      - cache
+      - objectstore
+      - db_setup
+    environment:
+      DATABASE_URL: postgresql://app:app@db:5432/app
+      REDIS_URL: redis://cache:6379
+      S3_ENDPOINT: http://objectstore:4566
+      S3_REGION: us-east-1
+      S3_ACCESS_KEY_ID: test
+      S3_SECRET_ACCESS_KEY: test
+      EVIDENCE_BUCKET: evidence-sanitized
+      THUMBS_BUCKET: evidence-thumbs
+
+volumes:
+  pgdata:
+  localstack:
