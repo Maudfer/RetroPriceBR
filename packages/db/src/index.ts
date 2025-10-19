@@ -1,4 +1,6 @@
 import { Client } from "pg";
+export { createPool, createDrizzle } from "./lib/client.js";
+export * as schema from "./schema/index.js";
 
 export interface DatabaseConfig {
   url: string;

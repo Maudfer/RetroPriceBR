@@ -2,13 +2,14 @@ import "dotenv/config";
 import { runSeeds } from "../lib/seeder.js";
 
 const databaseUrl = process.env.DATABASE_URL;
+const datasetDir = process.env.PLAYMYDATA_DIR;
 
 if (!databaseUrl) {
   console.error("[db] DATABASE_URL is not set. Aborting seeding.");
   process.exit(1);
 }
 
-runSeeds(databaseUrl)
+runSeeds(databaseUrl, { datasetDir })
   .then(() => {
     console.log("[db] seed command finished successfully");
   })
