@@ -14,7 +14,9 @@ RUN npm install --include=dev
 
 FROM deps AS builder
 COPY . .
-RUN npm run build --workspace @retroprice/db
+RUN npm run build --workspace @retroprice/shared \
+	&& npm run build --workspace @retroprice/core \
+	&& npm run build --workspace @retroprice/db
 
 FROM base AS runner
 WORKDIR /app

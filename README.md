@@ -33,10 +33,15 @@ docker compose -f infra/docker-compose.yml up --build
 ### Makefile shortcuts
 
 ```bash
-make run-docker     # build + launch the full stack
+make run-docker     # build infra, apply migrations/seeds, then launch web+worker
+make docker-logs    # stream docker compose logs
 make build          # build web, worker, and supporting packages
-make db-setup       # run migrations followed by seeds
+make db-setup       # alias for run-docker (kept for convenience)
 make stop-docker    # tear everything back down
 ```
+
+Run targets rely on the Postgres container being reachable at `tcp:127.0.0.1:5432`; override with
+`DB_WAIT_TARGET=tcp:host.docker.internal:5432` (or similar) if needed. Manual database commands such
+as `make db-migrate` and `make db-seed` still accept a `DATABASE_URL` override.
 
 Set environment variables via `.env` files or the Docker Compose file. See `infra/docker-compose.yml` for the minimum set.

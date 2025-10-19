@@ -11,6 +11,15 @@
     "composite": true,
     "declaration": true,
     "declarationMap": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "baseUrl": ".",
+    "paths": {
+      "@retroprice/shared": ["packages/shared/src/index.ts"],
+      "@retroprice/shared/*": ["packages/shared/src/*"],
+      "@retroprice/core": ["packages/core/src/index.ts"],
+      "@retroprice/core/*": ["packages/core/src/*"],
+      "@retroprice/db": ["packages/db/src/index.ts"],
+      "@retroprice/db/*": ["packages/db/src/*"]
+    }
   }
 }
