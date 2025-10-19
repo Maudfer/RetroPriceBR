@@ -18,8 +18,6 @@
         "dev:worker": "npm run dev --workspace worker",
         "build:worker": "npm run build --workspace worker",
         "start:worker": "npm run start --workspace worker",
-        "db:migrate": "npm run migrate --workspace @retroprice/db",
-        "db:seed": "npm run seed --workspace @retroprice/db",
         "db:setup": "npm run setup --workspace @retroprice/db"
     },
     "engines": {

@@ -28,8 +28,11 @@ FROM base AS runner
 ENV NODE_ENV=production
 WORKDIR /app
 ENV PORT=3000
+COPY --from=builder /app/package.json /app/package.json
+COPY --from=builder /app/package-lock.json /app/package-lock.json
 COPY --from=builder /app/apps/web/.next /app/apps/web/.next
 COPY --from=builder /app/apps/web/package.json /app/apps/web/package.json
+COPY --from=builder /app/packages /app/packages
 COPY --from=builder /app/node_modules /app/node_modules
 COPY --from=builder /app/apps/web/public /app/apps/web/public
 EXPOSE 3000

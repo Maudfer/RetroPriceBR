@@ -26,7 +26,10 @@ RUN npm run build --workspace @retroprice/shared \
 FROM node:20-bookworm-slim AS runner
 WORKDIR /app
 ENV NODE_ENV=production
+COPY --from=builder /app/package.json /app/package.json
+COPY --from=builder /app/package-lock.json /app/package-lock.json
 COPY --from=builder /app/apps/worker/dist /app/apps/worker/dist
 COPY --from=builder /app/apps/worker/package.json /app/apps/worker/package.json
+COPY --from=builder /app/packages /app/packages
 COPY --from=builder /app/node_modules /app/node_modules
 CMD ["npm", "run", "start:worker"]

@@ -15,6 +15,13 @@
       "when": 1760857435610,
       "tag": "0001_marvelous_thundra",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1760860000000,
+      "tag": "0002_playmydata_seed",
+      "breakpoints": true
     }
   ]
 }

@@ -1,1 +1,0 @@
--- Deprecated placeholder. Schema now initialized by migrations/0000_sturdy_blob.sql.

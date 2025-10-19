@@ -18,6 +18,6 @@ export interface QueueNames {
 }
 
 export const queueNames: QueueNames = {
-  evidenceSanitization: "evidence:sanitization",
-  nightlyAggregation: "jobs:nightly-aggregation"
+  evidenceSanitization: "evidence-sanitization",
+  nightlyAggregation: "jobs-nightly-aggregation"
 };

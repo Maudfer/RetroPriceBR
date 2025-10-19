@@ -23,4 +23,5 @@ WORKDIR /app
 COPY --from=builder /app/packages/db/dist /app/packages/db/dist
 COPY --from=builder /app/packages/db/migrations /app/packages/db/migrations
 COPY --from=builder /app/node_modules /app/node_modules
+COPY --from=builder /app/datasets /app/datasets
 CMD ["node", "packages/db/dist/scripts/setup.js"]
