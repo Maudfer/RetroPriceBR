@@ -4,20 +4,22 @@ CROSS_ENV = npx cross-env
 WAIT_ON = npx wait-on
 DB_WAIT_TARGET ?= tcp:127.0.0.1:5432
 
-.PHONY: help install build clean run-docker run-docker-detached docker-logs stop-docker db-migrate db-seed db-setup lint
+.PHONY: help install build clean run-docker run-docker-detached docker-logs stop-docker db-migrate db-seed db-setup lint test verify
 
 help:
 	@echo "Available targets:"
 	@echo "  make install              # install npm dependencies"
 	@echo "  make build                # build all workspaces"
-	@echo "  make run-docker           # build and start docker compose stack in background"
+	@echo "  make run-docker           # bring up infra, apply migrations, start web & worker"
 	@echo "  make run-docker-detached  # alias for run-docker (kept for compatibility)"
 	@echo "  make docker-logs          # tail docker compose logs"
 	@echo "  make stop-docker          # stop docker compose stack"
 	@echo "  make db-migrate           # run database migrations"
 	@echo "  make db-seed              # seed the database"
-	@echo "  make db-setup             # run migrations and seeds"
-	@echo "  make lint                 # lint the web application"
+	@echo "  make db-setup             # alias for run-docker"
+	@echo "  make lint                 # run lint across workspaces"
+	@echo "  make test                 # run the default test suite"
+	@echo "  make verify               # lint + build (CI parity)"
 
 install:
 	npm install
@@ -56,4 +58,10 @@ db-setup: run-docker
 	@echo "Database migrations and seeds completed via docker stack."
 
 lint:
-	npm run lint:web
+	npm run lint
+
+test:
+	npm run test
+
+verify:
+	npm run verify

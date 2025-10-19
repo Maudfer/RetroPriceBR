@@ -30,6 +30,14 @@ Docker usage:
 docker compose -f infra/docker-compose.yml up --build
 ```
 
+### Local checks
+
+```bash
+npm run lint      # fast lint check (web app today)
+npm run verify    # lint + build (CI equivalent)
+make verify       # same as npm run verify
+```
+
 ### Makefile shortcuts
 
 ```bash
@@ -45,3 +53,8 @@ Run targets rely on the Postgres container being reachable at `tcp:127.0.0.1:543
 as `make db-migrate` and `make db-seed` still accept a `DATABASE_URL` override.
 
 Set environment variables via `.env` files or the Docker Compose file. See `infra/docker-compose.yml` for the minimum set.
+
+## Engineering references
+
+- `docs/engineering/conventions.md` – naming, API style, and schema guidance.
+- `docs/engineering/secrets.md` – environment variable & secret handling strategy.
