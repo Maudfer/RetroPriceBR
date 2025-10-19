@@ -1,5 +1,5 @@
 import { readdirSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Client } from "pg";
 
@@ -8,7 +8,8 @@ interface MigrationFile {
   sql: string;
 }
 
-const migrationsDir = fileURLToPath(new URL("../../migrations", import.meta.url));
+const moduleDir = dirname(fileURLToPath(import.meta.url));
+const migrationsDir = join(moduleDir, "..", "..", "migrations");
 
 const loadMigrationFiles = (): MigrationFile[] => {
   const files = readdirSync(migrationsDir).filter((file) => file.endsWith(".sql"));

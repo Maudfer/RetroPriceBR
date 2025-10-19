@@ -2,6 +2,7 @@
 FROM node:20-bookworm-slim AS base
 WORKDIR /app
 ENV NODE_ENV=production
+ENV NPM_CONFIG_PRODUCTION=false
 
 FROM base AS deps
 # Install dependencies with npm workspaces
@@ -11,16 +12,20 @@ COPY apps/worker/package.json apps/worker/package.json
 COPY packages/shared/package.json packages/shared/package.json
 COPY packages/core/package.json packages/core/package.json
 COPY packages/db/package.json packages/db/package.json
-RUN npm install
+RUN npm install --workspaces --include-workspace-root
 
 FROM deps AS builder
+ENV NODE_ENV=production
+ENV NPM_CONFIG_PRODUCTION=false
 COPY . .
+RUN npm install --workspaces --include-workspace-root
 RUN npm run build --workspace @retroprice/shared \
 	&& npm run build --workspace @retroprice/core \
 	&& npm run build --workspace @retroprice/db \
 	&& npm run build:web
 
 FROM base AS runner
+ENV NODE_ENV=production
 WORKDIR /app
 ENV PORT=3000
 COPY --from=builder /app/apps/web/.next /app/apps/web/.next

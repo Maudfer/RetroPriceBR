@@ -9,7 +9,7 @@
         "dist"
     ],
     "scripts": {
-        "build": "tsc --build tsconfig.json",
+        "build": "tsc --build --force tsconfig.json",
         "migrate:run": "node dist/scripts/migrate.js",
         "seed:run": "node dist/scripts/seed.js",
         "setup:run": "node dist/scripts/setup.js",
@@ -32,6 +32,10 @@
         ".": {
             "import": "./dist/index.js",
             "types": "./dist/index.d.ts"
+        },
+        "./schema": {
+            "import": "./dist/schema/index.js",
+            "types": "./dist/schema/index.d.ts"
         }
     }
 }

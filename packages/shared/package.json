@@ -9,7 +9,7 @@
         "dist"
     ],
     "scripts": {
-        "build": "tsc --build tsconfig.json"
+        "build": "tsc --build --force tsconfig.json"
     },
     "exports": {
         ".": {
