@@ -9,21 +9,24 @@
         "dist"
     ],
     "scripts": {
-            "build": "tsc --build tsconfig.json",
-            "migrate:run": "node dist/scripts/migrate.js",
-            "seed:run": "node dist/scripts/seed.js",
-            "setup:run": "node dist/scripts/setup.js",
-            "migrate": "npm run build && npm run migrate:run",
-            "seed": "npm run build && npm run seed:run",
-            "setup": "npm run build && npm run setup:run"
+        "build": "tsc --build tsconfig.json",
+        "migrate:run": "node dist/scripts/migrate.js",
+        "seed:run": "node dist/scripts/seed.js",
+        "setup:run": "node dist/scripts/setup.js",
+        "migrate": "npm run build && npm run migrate:run",
+        "seed": "npm run build && npm run seed:run",
+        "setup": "npm run build && npm run setup:run",
+        "generate": "npm run build && drizzle-kit generate --config ./drizzle.config.ts"
     },
     "dependencies": {
-            "@retroprice/shared": "0.1.0",
-            "dotenv": "^16.4.5",
-            "pg": "^8.13.1"
-        },
-        "devDependencies": {
-            "@types/pg": "^8.11.5"
+        "@retroprice/shared": "0.1.0",
+        "dotenv": "^16.4.5",
+        "drizzle-orm": "^0.44.6",
+        "pg": "^8.13.1"
+    },
+    "devDependencies": {
+        "@types/pg": "^8.11.5",
+        "drizzle-kit": "^0.31.5"
     },
     "exports": {
         ".": {
