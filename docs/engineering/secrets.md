@@ -4,7 +4,7 @@ All services rely on environment variables. The repository only ships examplesâ€
 
 ## Local Development
 - Copy `.env.example` to `.env.local` at the repository root. The Makefile and Docker Compose files automatically load it when present.
-- Keep service-specific overrides (e.g. Next.js environment) under `apps/web/.env.local` only if a variable must be scoped to that app.
+- Keep service-specific overrides (e.g. Next.js environment) under `apps/webapp/.env.local` only if a variable must be scoped to that app.
 - Secrets required for third-party integrations (Google OAuth, S3 credentials) should be generated per developer and stored in your password manager.
 
 ## Docker & CI

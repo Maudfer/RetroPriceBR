@@ -1,60 +1,57 @@
 # RetroPriceBR Monorepo
 
-This repository bootstraps the MVP infrastructure for the Retro-Brazil Price Index. It uses an npm workspace-based monorepo that hosts the Next.js web application, background worker, and shared packages.
+This repository bootstraps the MVP infrastructure for the Retro-Brazil Price Index. It is an npm workspace-based monorepo that hosts the Next.js web application, background worker, and supporting packages.
 
-## Structure
+## Repository layout
 
 ```
-apps/
-  web/       # Next.js web + API surface
-  worker/    # BullMQ worker + cron entrypoint
-packages/
-  shared/    # Cross-cutting types and constants
-  core/      # Domain logic (confidence, sanitization helpers)
-  db/        # Database utilities and schema entrypoint
+datasets/                 # Reference CSV datasets used by the seeding scripts
+docs/                     # Engineering conventions and secret-management notes
 infra/
-  docker-compose.yml
+  docker-compose.yml      # Local infrastructure stack (db, cache, object storage, app workers)
+packages/
+  shared/                 # Cross-cutting types and constants
+  core/                   # Domain logic (parsing, confidence scoring helpers)
+  db/                     # Database utilities, migrations, and seeding scripts
+  webapp/                 # Next.js application (app router + API routes)
+  worker/                 # BullMQ worker and background jobs
+Makefile                  # Local automation entrypoints
+drizzle.config.ts         # Drizzle kit configuration
 ```
 
-## Getting Started
+## Local development
 
 ```bash
-npm install
-npm run dev:web
-npm run dev:worker
+npm install               # install all workspace dependencies
+npm run dev:web           # start Next.js in Turbopack dev mode
+npm run dev:worker        # run the BullMQ worker in watch mode
 ```
 
-Docker usage:
+Useful scripts:
 
 ```bash
-docker compose -f infra/docker-compose.yml up --build
+npm run build             # build shared/core/db + webapp + worker
+npm run lint              # lint (currently focused on the webapp)
+npm run verify            # lint + test + build (CI parity)
 ```
 
-### Local checks
+## Makefile shortcuts
 
 ```bash
-npm run lint      # fast lint check (web app today)
-npm run verify    # lint + build (CI equivalent)
-make verify       # same as npm run verify
+make setup-local          # install dependencies and build all workspaces
+make build                # run the monorepo build
+make run-docker           # build images, wait for db, then launch webapp + worker
+make setup-db-docker      # run migrations and dataset seeding against the docker stack
+make stop-docker          # tear the compose stack down
+make clean-local          # remove build artifacts and Next.js cache
+make verify               # lint + test + build via npm run verify
 ```
 
-### Makefile shortcuts
+Docker flows rely on Postgres being reachable at `tcp:127.0.0.1:5432`. Override the wait target with `DB_WAIT_TARGET=tcp:host.docker.internal:5432` (or any compatible endpoint) when running from WSL/macOS. Database scripts continue to accept `DATABASE_URL` overrides as needed.
 
-```bash
-make run-docker     # build infra, apply migrations/seeds, then launch web+worker
-make docker-logs    # stream docker compose logs
-make build          # build web, worker, and supporting packages
-make db-setup       # alias for run-docker (kept for convenience)
-make stop-docker    # tear everything back down
-```
-
-Run targets rely on the Postgres container being reachable at `tcp:127.0.0.1:5432`; override with
-`DB_WAIT_TARGET=tcp:host.docker.internal:5432` (or similar) if needed. Manual database commands such
-as `make db-migrate` and `make db-seed` still accept a `DATABASE_URL` override.
-
-Set environment variables via `.env` files or the Docker Compose file. See `infra/docker-compose.yml` for the minimum set.
+Set environment variables via `.env` files or the compose file. Review `infra/docker-compose.yml` for the minimal set required to boot the stack.
 
 ## Engineering references
 
-- `docs/engineering/conventions.md` – naming, API style, and schema guidance.
-- `docs/engineering/secrets.md` – environment variable & secret handling strategy.
+- `docs/engineering/conventions.md` – naming, API style, and schema guidance
+- `docs/engineering/secrets.md` – environment variable & secret handling strategy
