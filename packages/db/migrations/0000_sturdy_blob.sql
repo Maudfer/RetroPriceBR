@@ -210,6 +210,7 @@ ALTER TABLE "purchases" ADD CONSTRAINT "purchases_console_listing_id_console_lis
 ALTER TABLE "purchases" ADD CONSTRAINT "purchases_submitted_by_users_id_fk" FOREIGN KEY ("submitted_by") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;
 ALTER TABLE "purchases" ADD CONSTRAINT "purchases_store_id_stores_id_fk" FOREIGN KEY ("store_id") REFERENCES "public"."stores"("id") ON DELETE set null ON UPDATE no action;
 ALTER TABLE "purchases" ADD CONSTRAINT "purchases_livestream_id_livestreams_id_fk" FOREIGN KEY ("livestream_id") REFERENCES "public"."livestreams"("id") ON DELETE set null ON UPDATE no action;
+
 CREATE UNIQUE INDEX "purchase_reports_unique_reporter" ON "purchase_reports" USING btree ("purchase_id","reporter_id");
 CREATE UNIQUE INDEX "purchases_natural_key" ON "purchases" USING btree ("listing_type","game_listing_id","console_listing_id","store_id","source_enum","sold_at","price_cents");
 CREATE INDEX "listing_search_title_trgm_idx" ON "listing_search" USING gin ("title" gin_trgm_ops);

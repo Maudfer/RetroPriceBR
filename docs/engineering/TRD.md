@@ -61,7 +61,7 @@ Makefile                   # Local automation entrypoints
 package.json               # npm workspaces definition
 ```
 
-### docker-compose (skeleton)
+### Docker Infrastructure (skeleton)
 ```yaml
 services:
   db:
