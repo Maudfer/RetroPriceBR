@@ -12,6 +12,7 @@
         "build": "tsc --build --force tsconfig.json",
         "setup:run": "node dist/scripts/db-setup.js",
         "setup": "npm run build && npm run setup:run",
+        "datasets:merge": "npm run build && node dist/scripts/merge-datasets.js",
         "generate": "npm run build && drizzle-kit generate --config ./drizzle.config.ts"
     },
     "dependencies": {

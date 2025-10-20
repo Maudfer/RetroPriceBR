@@ -2,12 +2,11 @@ import { eq, inArray } from "drizzle-orm";
 import { Client } from "pg";
 import { createDrizzle } from "./client.js";
 import {
-  chunkArray,
-  loadPlayMyDataDataset,
-  PLAYMYDATA_LISTING_NOTE,
-  PLAYMYDATA_SOURCE,
-  type LoadPlayMyDataOptions
-} from "./playmydata-loader.js";
+  loadRetroPriceDataset,
+  RETROPRICE_LISTING_NOTE,
+  RETROPRICE_SOURCE,
+  type LoadRetroPriceOptions
+} from "./catalog-loader.js";
 import {
   consoleListings,
   consoles,
@@ -23,7 +22,7 @@ interface SeedRecord {
   currencyCode: string;
 }
 
-interface SeedOptions extends LoadPlayMyDataOptions { }
+interface SeedOptions extends LoadRetroPriceOptions { }
 
 const defaultGuides: SeedRecord[] = [
   {
@@ -44,8 +43,25 @@ const defaultGuides: SeedRecord[] = [
 ];
 
 const DEFAULT_LISTING_CONDITION = "LOOSE" as (typeof conditionEnum.enumValues)[number];
+const PLAYMYDATA_SOURCE = "PLAYMYDATA";
+const SOURCES_TO_RESET = [PLAYMYDATA_SOURCE, RETROPRICE_SOURCE];
+
+const chunkArray = <T>(values: T[], size = 500): T[][] => {
+  if (size <= 0) {
+    return [values];
+  }
+
+  const result: T[][] = [];
+  for (let index = 0; index < values.length; index += size) {
+    result.push(values.slice(index, index + size));
+  }
+
+  return result;
+};
 
 const seedPriceGuides = async (databaseUrl: string): Promise<void> => {
+  console.log("[db] seeding price guides...");
+
   const client = new Client({ connectionString: databaseUrl, application_name: "retropricebr" });
   await client.connect();
 
@@ -70,11 +86,13 @@ const seedPriceGuides = async (databaseUrl: string): Promise<void> => {
   }
 };
 
-const seedPlayMyData = async (databaseUrl: string, options: SeedOptions): Promise<void> => {
-  const dataset = loadPlayMyDataDataset({ datasetDir: options.datasetDir });
+const seedCatalog = async (databaseUrl: string, options: SeedOptions): Promise<void> => {
+  console.log("[db] seeding catalog...");
+
+  const dataset = loadRetroPriceDataset({ datasetDir: options.datasetDir, datasetPath: options.datasetPath });
 
   if (dataset.games.length === 0) {
-    console.warn("[db] PlayMyData dataset is empty. Skipping ingestion.");
+    console.warn("[db] RetroPriceBR catalog is empty. Skipping ingestion.");
     return;
   }
 
@@ -82,11 +100,11 @@ const seedPlayMyData = async (databaseUrl: string, options: SeedOptions): Promis
 
   try {
     await db.transaction(async (tx) => {
-      await tx.delete(gameListings).where(eq(gameListings.source, PLAYMYDATA_SOURCE));
-      await tx.delete(games).where(eq(games.source, PLAYMYDATA_SOURCE));
-      await tx.delete(consoleListings).where(eq(consoleListings.source, PLAYMYDATA_SOURCE));
-      await tx.delete(consoles).where(eq(consoles.source, PLAYMYDATA_SOURCE));
-      await tx.delete(platforms).where(eq(platforms.source, PLAYMYDATA_SOURCE));
+      await tx.delete(gameListings).where(inArray(gameListings.source, SOURCES_TO_RESET));
+      await tx.delete(games).where(inArray(games.source, SOURCES_TO_RESET));
+      await tx.delete(consoleListings).where(inArray(consoleListings.source, SOURCES_TO_RESET));
+      await tx.delete(consoles).where(inArray(consoles.source, SOURCES_TO_RESET));
+      await tx.delete(platforms).where(inArray(platforms.source, SOURCES_TO_RESET));
 
       for (const chunk of chunkArray(dataset.platforms, 500)) {
         await tx.insert(platforms).values(
@@ -94,7 +112,7 @@ const seedPlayMyData = async (databaseUrl: string, options: SeedOptions): Promis
             name: platform.name,
             slug: platform.slug,
             externalId: platform.externalId,
-            source: PLAYMYDATA_SOURCE
+            source: RETROPRICE_SOURCE
           }))
         );
       }
@@ -125,7 +143,7 @@ const seedPlayMyData = async (databaseUrl: string, options: SeedOptions): Promis
             sku: null,
             notes: null,
             externalId: consoleItem.externalId,
-            source: PLAYMYDATA_SOURCE,
+            source: RETROPRICE_SOURCE,
             platformId
           };
         })
@@ -157,7 +175,7 @@ const seedPlayMyData = async (databaseUrl: string, options: SeedOptions): Promis
             slug: game.slug,
             igdbSlug: null,
             externalId: game.externalId,
-            source: PLAYMYDATA_SOURCE,
+            source: RETROPRICE_SOURCE,
             releaseYear: game.releaseYear
           };
         })
@@ -179,8 +197,8 @@ const seedPlayMyData = async (databaseUrl: string, options: SeedOptions): Promis
       const gameListingsPayload = insertedGames.map((record) => ({
         gameId: record.id,
         condition: DEFAULT_LISTING_CONDITION,
-        notes: PLAYMYDATA_LISTING_NOTE,
-        source: PLAYMYDATA_SOURCE
+        notes: RETROPRICE_LISTING_NOTE,
+        source: RETROPRICE_SOURCE
       }));
 
       for (const chunk of chunkArray(gameListingsPayload, 500)) {
@@ -194,8 +212,8 @@ const seedPlayMyData = async (databaseUrl: string, options: SeedOptions): Promis
       const consoleListingsPayload = insertedConsoles.map((record) => ({
         consoleId: record.id,
         condition: DEFAULT_LISTING_CONDITION,
-        notes: PLAYMYDATA_LISTING_NOTE,
-        source: PLAYMYDATA_SOURCE
+        notes: RETROPRICE_LISTING_NOTE,
+        source: RETROPRICE_SOURCE
       }));
 
       for (const chunk of chunkArray(consoleListingsPayload, 500)) {
@@ -207,7 +225,7 @@ const seedPlayMyData = async (databaseUrl: string, options: SeedOptions): Promis
       }
 
       console.log(
-        `[db] PlayMyData: ${dataset.platforms.length} platforms, ${dataset.consoles.length} consoles, ${dataset.games.length} games ingested`
+        `[db] RetroPriceBR catalog: ${dataset.platforms.length} platforms, ${dataset.consoles.length} consoles, ${dataset.games.length} games ingested`
       );
     });
   } finally {
@@ -220,6 +238,7 @@ export const runSeeds = async (databaseUrl: string, options: SeedOptions = {}): 
     throw new Error("DATABASE_URL is required to seed the database");
   }
 
+
   await seedPriceGuides(databaseUrl);
-  await seedPlayMyData(databaseUrl, options);
+  await seedCatalog(databaseUrl, options);
 };

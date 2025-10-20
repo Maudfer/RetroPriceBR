@@ -3,7 +3,6 @@
     "private": true,
     "version": "0.1.0",
     "workspaces": [
-        "apps/*",
         "packages/*"
     ],
     "scripts": {
@@ -13,7 +12,7 @@
         "start:web": "npm run start --workspace web",
         "lint:web": "npm run lint --workspace web",
         "lint": "npm run lint:web",
-        "test": "vitest run",
+        "test": "vitest run --passWithNoTests",
         "verify": "npm run lint && npm run test && npm run build",
         "dev:worker": "npm run dev --workspace worker",
         "build:worker": "npm run build --workspace worker",

@@ -38,12 +38,12 @@ services:
     environment:
       DATABASE_URL: postgresql://app:app@db:5432/app
     restart: "no"
-    command: ["sh", "-c", "npx wait-on tcp:db:5432 && node packages/db/dist/scripts/setup.js"]
+    command: [ "sh", "-c", "npx wait-on tcp:db:5432 && node packages/db/dist/scripts/setup.js" ]
 
-  web:
+  webapp:
     build:
       context: ..
-      dockerfile: apps/web/Dockerfile
+      dockerfile: packages/webapp/Dockerfile
     restart: unless-stopped
     depends_on:
       - db
@@ -58,7 +58,7 @@ services:
       S3_SECRET_ACCESS_KEY: test
       EVIDENCE_BUCKET: evidence-sanitized
       THUMBS_BUCKET: evidence-thumbs
-      JWT_JWKS_URI: http://web:3000/.well-known/jwks.json
+      JWT_JWKS_URI: http://webapp:3000/.well-known/jwks.json
       NEXT_PUBLIC_API_URL: http://localhost:3000
     ports:
       - "3000:3000"
@@ -66,7 +66,7 @@ services:
   worker:
     build:
       context: ..
-      dockerfile: apps/worker/Dockerfile
+      dockerfile: packages/worker/Dockerfile
     restart: unless-stopped
     depends_on:
       - db
